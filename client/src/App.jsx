@@ -1,17 +1,43 @@
 import React, { useState } from 'react';
+import Axios from 'axios';
 import './App.css';
 
 export default function App() {
 
   // Para gestionar los datos que lleguen a través de los inputs
-  const [nombre, setNombre] = useState("");
-  const [edad, setEdad] = useState(0);
-  const [pais, setPais] = useState("");
-  const [cargo, setCargo] = useState("");
-  const [anios, setAnios] = useState(0);
+  const [name, setName] = useState("");
+  const [age, setAge] = useState(0);
+  const [country, setCountry] = useState("");
+  const [charge, setCharge] = useState("");
+  const [years, setYears] = useState(0);
 
-  const mostrarDatos = ()=> {
-    alert(nombre);
+  const add = async ()=> {
+    try {
+      // alert(name);
+    Axios.post('http://localhost:3000/create', {
+      name,
+      age,
+      country,
+      charge,
+      years
+    });
+    alert("Empleado Registrado");
+    } catch (error) {
+      alert(`Error al registrar usuario: ${error.message}`);
+    }
+    // alert(nombre);
+    // Axios.post('http://localhost:3000/create', {
+    //   name,
+    //   age,
+    //   country,
+    //   charge,
+    //   years
+    // }).then(()=> {
+  //     alert("Empleado Registrado");
+  //   })
+  //   .catch((error)=> {
+  //     alert(`Error al registrar usuario: ${error.message}`);
+  //   });
   }
 
   return (
@@ -22,7 +48,7 @@ export default function App() {
           <label><div>Nombre: </div> 
             <input
               onChange={(event)=> {
-                setNombre(event.target.value);
+                setName(event.target.value);
               }}
               type='text' 
               placeholder='Nombre' 
@@ -31,7 +57,7 @@ export default function App() {
           <label><div>Edad: </div> 
             <input 
               onChange={(event)=> {
-                setNombre(event.target.value);
+                setAge(event.target.value);
               }}
               type='number'
               placeholder='Edad' 
@@ -40,7 +66,7 @@ export default function App() {
           <label><div>Pais: </div> 
             <input 
               onChange={(event)=> {
-                setNombre(event.target.value);
+                setCountry(event.target.value);
               }}
               type='text'
               placeholder='Pais' 
@@ -49,7 +75,7 @@ export default function App() {
           <label><div>Cargo: </div> 
             <input 
               onChange={(event)=> {
-                setNombre(event.target.value);
+                setCharge(event.target.value);
               }}
               type='text'
               placeholder='Cargo' 
@@ -58,7 +84,7 @@ export default function App() {
           <label><div>Años: </div> 
             <input 
               onChange={(event)=> {
-                setNombre(event.target.value);
+                setYears(event.target.value);
               }}
               type='number'
               placeholder='Años' 
@@ -66,7 +92,7 @@ export default function App() {
 
 
           <button
-            onClick={mostrarDatos}
+            onClick={add}
           >Registrar</button>
         </form>
       </div>
