@@ -5,6 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import {
   createEmployee,
+  getEmployees
 } from './database.js';
 
 const corsOptions = {
@@ -17,9 +18,21 @@ const app = express();
 app.use(express.json());  // Este es importante para poder usar express con solicitudes en formato JSON
 app.use(cors(corsOptions));
 
+// -- GET --
+
+app.get("/api/employees", async(req, res)=> {
+  try {
+    const employees = await getEmployees();
+    res.status(201).send(employees);
+  } catch(err) {
+    console.log(err);
+    res.status(500).send({ error: `Internal Server Error: ${err}` });
+  }
+});
+
 // -- POST --
 
-app.post("/create", async(req, res)=> {
+app.post("/api/create", async(req, res)=> {
   try {
     const { name, age, country, charge, years } = req.body;
 
@@ -36,7 +49,6 @@ app.post("/create", async(req, res)=> {
     res.status(500).send({ error: "Internal Server Error" });
   }
 });
-
 
 const PORT = process.env.PORT || 3000;
 

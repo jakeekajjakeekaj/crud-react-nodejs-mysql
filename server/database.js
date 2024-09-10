@@ -12,6 +12,20 @@ const pool = mysql
   })
   .promise();
 
+// GET EMPLOYEE
+
+export async function getEmployees() {
+  const [rows] = await pool.query(
+    `
+      SELECT * FROM employees
+    `
+  );
+
+  return rows;
+};
+
+// POST EMPLOYEE
+
 export async function createEmployee(name, age, country, charge, years) {
   const [result] = await pool.query(  // [result] es utilizado como desesctructuración de nuestra pool, para este caso se puede utilizar [rows] o [result], generalmente [rows] suele ser el primer dato, este se suele mostrar en forma de filas y corresponde más a cuando se usa SELECT, sin embargo [result] es otro dato de la desesctrucutración, y es el que se encarga de checar por ejemplo ya los metadatos y ese tipo de cosas, básicamente información generada al utilizar INSERT, UPDATE, DELETE, etc.
     `

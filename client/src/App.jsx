@@ -6,22 +6,34 @@ export default function App() {
 
   // Para gestionar los datos que lleguen a través de los inputs
   const [name, setName] = useState("");
-  const [age, setAge] = useState(0);
+  const [age, setAge] = useState("");
   const [country, setCountry] = useState("");
   const [charge, setCharge] = useState("");
-  const [years, setYears] = useState(0);
+  const [years, setYears] = useState("");
+
+  const [employees, setemployees] = useState([]);
 
   const add = async ()=> {
     try {
       // alert(name);
-    Axios.post('http://localhost:3000/create', {
+    Axios.post('http://localhost:3000/api/create', {
       name,
       age,
       country,
       charge,
       years
+    }).then(()=> {
+      getEmployees();
+      alert("Empleado Registrado");
+
+      // Resetea los valores de los inputs
+      setName("");
+      setAge("");
+      setCountry("");
+      setCharge("");
+      setYears("");
     });
-    alert("Empleado Registrado");
+    // alert("Empleado Registrado");
     } catch (error) {
       alert(`Error al registrar usuario: ${error.message}`);
     }
@@ -40,6 +52,19 @@ export default function App() {
   //   });
   }
 
+  const getEmployees = async ()=> {
+    try {
+    // console.log("pasa 1");
+    Axios.get('http://localhost:3000/api/employees').then((res)=> {
+      // console.log("pasa 2");
+      setemployees(res.data);
+      // alert("Get");
+    });
+    } catch (error) {
+      alert(`Error al registrar usuario: ${error.message}`);
+    }
+  }
+
   return (
     <div className="App">
       <div className="App__datos">
@@ -51,7 +76,8 @@ export default function App() {
                 setName(event.target.value);
               }}
               type='text' 
-              placeholder='Nombre' 
+              placeholder='Nombre'
+              value={ name }  // Control del Input
             /></label>
             
           <label><div>Edad: </div> 
@@ -60,7 +86,8 @@ export default function App() {
                 setAge(event.target.value);
               }}
               type='number'
-              placeholder='Edad' 
+              placeholder='Edad'
+              value={ age }
             /></label>
 
           <label><div>Pais: </div> 
@@ -69,7 +96,8 @@ export default function App() {
                 setCountry(event.target.value);
               }}
               type='text'
-              placeholder='Pais' 
+              placeholder='Pais'
+              value={ country }
             /></label>
 
           <label><div>Cargo: </div> 
@@ -78,7 +106,8 @@ export default function App() {
                 setCharge(event.target.value);
               }}
               type='text'
-              placeholder='Cargo' 
+              placeholder='Cargo'
+              value={ charge }
             /></label>
 
           <label><div>Años: </div> 
@@ -87,14 +116,34 @@ export default function App() {
                 setYears(event.target.value);
               }}
               type='number'
-              placeholder='Años' 
+              placeholder='Años'
+              value={ years }
             /></label>
 
 
-          <button
+          {/* <button
             onClick={add}
-          >Registrar</button>
+          >Registrar</button> */}
+          <button onClick={(event)=> {
+            event.preventDefault();
+            add();
+          }}>Registrar</button>
         </form>
+      </div>
+
+      <div className="list">
+        <button onClick={getEmployees}>Lista de Empleados</button>
+
+        {
+          employees.map((val, key)=> {
+            return (
+              <div className="">
+                {val.name}
+              </div>
+            )
+          })
+        }
+
       </div>
     </div>
   )
