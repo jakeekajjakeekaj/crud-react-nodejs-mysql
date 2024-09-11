@@ -10,12 +10,27 @@
   width: clamp(300px, 100%, 1000px);
 }
 
-.App__datos label div {
+/* .App__datos label div {
   text-align: right;
   padding-right: 5px;
-  width: 4.5em;
+  width: 4.5em;*/
+  /* border: 1px solid #000; */
+  /*font-weight: bold;
+} */
+
+.equal-span {
+  justify-content: center;
+  text-align: right;
+  padding-right: 5px;
+  width: 5.5em;
   /* border: 1px solid #000; */
   font-weight: bold;
+}
+
+.input-clamp {
+  width: clamp(300px, 100%, 900px);
+  margin: auto;
+  padding: 1em 0 1em 0;
 }
 
 .App__datos label input {
@@ -26,21 +41,23 @@
   border: 2px solid #0009;
 }
 
-.App__datos button {
+.my-button {
   color: #fff;
   width: 100%;
-  padding: 15px;
+  padding: .625em;
   border-radius: 7px;
   border: 2px solid #0002;
   background-color: #28a745;
   cursor: pointer;
-  width: clamp(300px, 100%, 800px);
+  width: clamp(300px, 100%, 900px);
+  font-weight: 400;
+  font-size: 1rem;
 }
 
-.App__datos button:hover {
+.my-button:hover {
   background-color: #218838;
 }
 
-.App__datos button:active {
+.my-button:active {
   background-color: #1e7e34;
 }

@@ -36,4 +36,4 @@
 // Necesitamos usar peticiones para el backend utilizando Fetch, para este ejemplo como una manera más simple se usará Axios, aparte de que la mayor ventaja que tiene Fetch es que es ligero y más flexible, sin embargo en la mayoría de los casos se usará y es preferible usar Axios.
 // Una vez finalizada nuestra función de add, solo cambiamos el mostrarDatos por add que se encontraba en nuestro React para el onClick del botón y listo, podremos ejecutar nuestro servidor y nuestro cliente
 
-// 
+// Una vez ya mas avanzado el proy, ya con conexiones funcionando de la DB al front con utilización hasta el momento de 2 API (POST Y GET), instalaremos bootstrap para mejorar la apariencia: npm install react-bootstrap bootstrap
