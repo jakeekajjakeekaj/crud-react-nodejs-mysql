@@ -1,3 +1,7 @@
+/* body {
+  max-width: 900px;
+} */
+
 .App__datos {
   text-align: center;
 }
@@ -27,7 +31,7 @@
   font-weight: bold;
 }
 
-.input-clamp {
+.box-clamp {
   width: clamp(300px, 100%, 900px);
   margin: auto;
   padding: 1em 0 1em 0;
@@ -38,7 +42,7 @@
   padding: 5px;
   box-sizing: border-box;
   border-radius: 6px;
-  border: 2px solid #0009;
+  /* border: 2px solid #0009; */
 }
 
 .my-button {
@@ -46,7 +50,8 @@
   width: 100%;
   padding: .625em;
   border-radius: 7px;
-  border: 2px solid #0002;
+  /* border: 2px solid #0002; */
+  border: none;
   background-color: #28a745;
   cursor: pointer;
   width: clamp(300px, 100%, 900px);
@@ -60,4 +65,23 @@
 
 .my-button:active {
   background-color: #1e7e34;
+}
+
+/* .my-button-warning {
+  color: #000;
+  background-color: #FFC107;
+  border: none;
+}
+
+.my-button-warning:hover {
+  background-color: #FFA000;
+}
+
+.my-button-warning:active {
+  background-color: #FF8F00;
+} */
+
+.box-clamp thead tr,
+.box-clamp tbody tr {
+  text-align: center;
 }

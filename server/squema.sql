@@ -13,4 +13,3 @@ CREATE TABLE employees (
   charge VARCHAR(100),
   years INT
 );
-

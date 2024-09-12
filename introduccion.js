@@ -37,3 +37,5 @@
 // Una vez finalizada nuestra función de add, solo cambiamos el mostrarDatos por add que se encontraba en nuestro React para el onClick del botón y listo, podremos ejecutar nuestro servidor y nuestro cliente
 
 // Una vez ya mas avanzado el proy, ya con conexiones funcionando de la DB al front con utilización hasta el momento de 2 API (POST Y GET), instalaremos bootstrap para mejorar la apariencia: npm install react-bootstrap bootstrap
+
+// Una vez finalizado esto, comenzaremos con el muestreado de nuestra lista de empleados, para esto seleccionaremos algún elemento table de bootstrap para facilitar todo

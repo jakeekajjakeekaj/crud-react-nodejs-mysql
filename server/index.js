@@ -5,7 +5,8 @@ import express from 'express';
 import cors from 'cors';
 import {
   createEmployee,
-  getEmployees
+  getEmployees,
+  updateEmployee
 } from './database.js';
 
 const corsOptions = {
@@ -20,7 +21,7 @@ app.use(cors(corsOptions));
 
 // -- GET --
 
-app.get("/api/employees", async(req, res)=> {
+app.get("/api/get/employees", async(req, res)=> {
   try {
     const employees = await getEmployees();
     res.status(201).send(employees);
@@ -32,7 +33,7 @@ app.get("/api/employees", async(req, res)=> {
 
 // -- POST --
 
-app.post("/api/create", async(req, res)=> {
+app.post("/api/create/employee", async(req, res)=> {
   try {
     const { name, age, country, charge, years } = req.body;
 
@@ -42,6 +43,26 @@ app.post("/api/create", async(req, res)=> {
     }
   
     const employee = await createEmployee(name, age, country, charge, years);
+    // console.log("SQL EJECUTADO");
+    res.status(201).send(employee);
+  } catch(err) {
+    console.log(err);
+    res.status(500).send({ error: "Internal Server Error" });
+  }
+});
+
+// -- PUT --
+
+app.put("/api/update/employee", async(req, res)=> {
+  try {
+    const { id, name, age, country, charge, years } = req.body;
+
+    // Validación básica de los datos
+    if (!id || !name || !age || !country || !charge || !years) {
+      return res.status(400).send({ error: "Todos los campos son obligatorios" });
+    }
+  
+    const employee = await updateEmployee(id, name, age, country, charge, years);
     // console.log("SQL EJECUTADO");
     res.status(201).send(employee);
   } catch(err) {
