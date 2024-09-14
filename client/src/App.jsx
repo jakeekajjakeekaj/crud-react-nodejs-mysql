@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 
 export default function App() {
 
@@ -13,34 +15,88 @@ export default function App() {
   const [years, setYears] = useState("");
   const [id, setId] = useState("");
 
-  const [employees, setemployees] = useState([]);
+  const [employees, setEmployees] = useState([]);
 
   const [edit, setEdit] = useState(false);
+
+  const MySwal = withReactContent(Swal);
+
+  function validateForm (originalEmployee) {
+    if (
+      name === originalEmployee.name &&
+      age === originalEmployee.age &&
+      country === originalEmployee.country &&
+      charge === originalEmployee.charge &&
+      years === originalEmployee.years
+    ) {
+      return true; // No se realizaron cambios, proceder sin validar
+    }
+    
+    validateForm();
+  }
+
+  function validateForm () {
+    if (!name || !age || !country || !charge || !years) {
+      MySwal.fire({
+        title: "Error",
+        text: "Por favor, completa todos los campos.",
+        icon: "error",
+        timer: 3500
+      });
+      return false;
+    }
+  
+    if (age <= 0 || years < 0) {
+      MySwal.fire({
+        title: "Error",
+        text: "La edad y los años de experiencia deben ser mayores que 0.",
+        icon: "error",
+        timer: 3500
+      });
+      return false;
+    }
+    return true;
+  };
+  
+    
 
   const add = async ()=> {
     try {
       // alert(name);
-    Axios.post('http://localhost:3000/api/create/employee', {
+    await Axios.post('http://localhost:3000/api/create/employee', {
       name,
       age,
       country,
       charge,
       years
-    }).then(()=> {
-      getEmployees();
-      alert("Empleado Registrado");
+    });
 
-      // Resetea los valores de los inputs
-      // setName("");
-      // setAge("");
-      // setCountry("");
-      // setCharge("");
-      // setYears("");
-      limpiarCampos();
+    getEmployees();
+    // alert("Empleado Registrado");
+
+    // Resetea los valores de los inputs
+    // setName("");
+    // setAge("");
+    // setCountry("");
+    // setCharge("");
+    // setYears("");
+    limpiarCampos();
+    MySwal.fire({
+      title: "Registro Exitoso!",
+      text: `El usuario ${name} fue registrado`,
+      icon: "success",
+      timer: 3500
     });
     // alert("Empleado Registrado");
     } catch (error) {
-      alert(`Error al registrar usuario: ${error.message}`);
+      MySwal.fire({
+        title: "Ooops...",
+        text: "Error al agregar el usuario",
+        icon: "error",
+        // footer: JSON.parse(JSON.stringify(error)).message==="Network Error"?"Intente más tarde":JSON.parse(JSON.stringify(error)),
+        timer: 3500
+      });
+      // alert(`Error al registrar usuario: ${error.message}`);
     }
     // alert(nombre);
     // Axios.post('http://localhost:3000/create', {
@@ -57,25 +113,96 @@ export default function App() {
   //   });
   };
 
-  const update = async ()=> {
-    try {
-      // alert(name);
-    Axios.put('http://localhost:3000/api/update/employee', {
-      id,
-      name,
-      age,
-      country,
-      charge,
-      years
-    }).then(()=> {
-      getEmployees();
-      alert("Empleado Actualizado");
+  const update = async (originalEmployee)=> {
+    // Verificar si originalEmployee es válido
+    if (!originalEmployee) {
+      MySwal.fire({
+        title: "Error",
+        text: "No se encontró el empleado a actualizar.",
+        icon: "error",
+        timer: 3500
+      });
+      return;
+    };
+
+    console.log("pasa 1");
+
+    if(validateForm(originalEmployee)) {
+      try {
+      console.log("pasa 2");
+      console.log(`${id} ${name} ${age} ${country} ${charge} ${years}`);
+        // alert(name);
+      await Axios.put('http://localhost:3000/api/update/employee', {
+        id,
+        name,
+        age: parseInt(age),
+        country,
+        charge,
+        years: parseInt(years)
+      });
+    console.log("pasa 3");
+  
+      await getEmployees();
+      // alert("Empleado Actualizado");
       setEdit(false);
       limpiarCampos();
+      MySwal.fire({
+        title: "Registro Actualizado!",
+        text: `El usuario ${name} fue actualizado`,
+        icon: "success",
+        timer: 3500
+      });
+      // alert("Empleado Registrado");
+      } catch (error) {
+        // alert(`Error al registrar usuario: ${error.message}`);
+        MySwal.fire({
+          title: "Oooops...",
+          text: "Error al actualizar el usuario",
+          icon: "error",
+          footer: JSON.parse(JSON.stringify(error)).message==="Network Error"?"Intente más tarde":JSON.parse(JSON.stringify(error)),
+          timer: 3500
+        });
+      }
+    }
+  };
+
+  const deleteEmp = async (id, name)=> {
+    const result = await MySwal.fire({
+      title: "¿Estás seguro?",
+      text: `Eliminarás al usuario ${name} de forma permanente`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si, deseo eliminar!",
+      cancelButtonText: "Cancelar",
     });
-    // alert("Empleado Registrado");
-    } catch (error) {
-      alert(`Error al registrar usuario: ${error.message}`);
+
+    if (result.isConfirmed) {
+      try {
+        // alert(name);
+        await Axios.delete(`http://localhost:3000/api/delete/employee/${id}`);
+
+        await getEmployees();
+        // alert("Empleado Actualizado");
+        // limpiarCampos();
+        await MySwal.fire({
+          title: "Eliminado!",
+          text: `El usuario ${name} ha sido eliminado.`,
+          icon: "success",
+          timer: 2500
+        });
+        // alert("Empleado Registrado");
+      } catch (error) {
+        // alert(`Error al eliminar usuario: ${error.message}`);
+        MySwal.fire({
+          title: "Oooops",
+          text: "Error al eliminar el usuario",
+          icon: "error",
+          footer: JSON.parse(JSON.stringify(error)).message==="Network Error"?"Intente más tarde":JSON.parse(JSON.stringify(error)),
+          timer: 3500
+        });
+      }
     }
   };
 
@@ -90,16 +217,22 @@ export default function App() {
 
   const getEmployees = async ()=> {
     try {
-    // console.log("pasa 1");
-    Axios.get('http://localhost:3000/api/get/employees').then((res)=> {
+      // console.log("pasa 1");
+      const res = await Axios.get('http://localhost:3000/api/get/employees');
       // console.log("pasa 2");
-      setemployees(res.data);
+      setEmployees(res.data);
       // alert("Get");
-    });
     } catch (error) {
-      alert(`Error al registrar usuario: ${error.message}`);
+      // alert(`Error al registrar usuario: ${error.message}`);
+      MySwal.fire({
+        title: "Oooops",
+        text: "Error al obtener los usuarios",
+        icon: "error",
+        footer: JSON.parse(JSON.stringify(error)).message==="Network Error"?"Intente más tarde":JSON.parse(JSON.stringify(error)),
+        timer: 3500
+      });
     }
-  }
+  };
 
   // Llama a getEmployees solo cuando el componente se monta
   useEffect(() => { // useEffect básicamente se basa en actuar al momento de detectar un cambio, antes se usaban cosas como para revisar la update sobre algo, pero con las actualizaciones ahora se usa useEffect, para este caso en específico, indicamos que al existir un reenderizado, lo de adentro se cargue, en vez de que se pueda llegar a cargar infinitamente como si de un bucle se tratara
@@ -115,7 +248,7 @@ export default function App() {
     setCharge(val.charge);
     setYears(val.years);
     setId(val.id);
-  }
+  };
 
   return (
     <div className="App">
@@ -196,7 +329,11 @@ export default function App() {
             <div>
               <button /*className='btn btn-success my-button'*/ className='btn btn-warning mx-1' onClick={(event)=> {
                 event.preventDefault();
-                update();
+                const originalEmployee = employees.find(emp => emp.id === id);  // Busca el empleado original
+                if (validateForm(originalEmployee)){
+                  update(originalEmployee);
+                };
+                // update();
               }}>Actualizar</button> 
               <button /*className='btn btn-success my-button'*/ className='btn btn-info mx-1' onClick={(event)=> {
                 event.preventDefault();
@@ -206,7 +343,8 @@ export default function App() {
             </div>
             : <button /*className='btn btn-success my-button'*/ className='my-button' onClick={(event)=> {
               event.preventDefault();
-              add();
+              if (validateForm()) add();
+              // add();
             }}>Registrar</button>
           }
           {/* <button className='my-button' onClick={(event)=> {
@@ -219,7 +357,8 @@ export default function App() {
       <table className="table table-striped box-clamp">
         <thead>
           <tr>
-            <th scope="col">#</th>
+            <th scope="col">No</th>
+            {/* <th scope="col">#</th> */}
             <th scope="col">Nombre</th>
             <th scope="col">Edad</th>
             <th scope="col">País</th>
@@ -230,10 +369,11 @@ export default function App() {
         </thead>
         <tbody>
           {
-            employees.map((val, key)=> {
+            employees.map((val, index)=> {
               return (
-                <tr key={ key }>
-                  <th scope="row">{ val.id }</th>
+                <tr key={ val.id }>
+                  <th scope="row">{ index + 1 }</th>
+                  {/* <td scope="row">{ val.id }</td> */}
                   <td>{ val.name }</td>
                   <td>{ val.age }</td>
                   <td>{ val.country }</td>
@@ -246,7 +386,12 @@ export default function App() {
                       editEmployee(val);
                     } }
                     className="btn btn-info">Editar</button>
-                    <button type="button" className="btn btn-danger">Eliminar</button>
+
+                    <button type="button"
+                    onClick={ ()=> {
+                      deleteEmp(val.id, val.name)
+                    } }
+                    className="btn btn-danger">Eliminar</button>
                   </div>
                   </td>
                 </tr>

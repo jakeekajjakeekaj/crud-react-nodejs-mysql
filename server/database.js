@@ -40,11 +40,23 @@ export async function createEmployee(name, age, country, charge, years) {
 // PUT EMPLOYEE
 
 export async function updateEmployee(id, name, age, country, charge, years) {
+  // console.log(`func ${id} ${name} ${age} ${country} ${charge} ${years}`);
   const [result] = await pool.query(
     `
       UPDATE employees SET name=?, age=?, country=?, charge=?, years=?
       WHERE id = ?;
     `, [name, age, country, charge, years, id]
+  );
+  return result;
+};
+
+// DELETE EMPLOYEE
+
+export async function deleteEmployee(id) {
+  const [result] = await pool.query(
+    `
+      DELETE FROM employees WHERE id = ? 
+    `, id
   );
   return result;
 };

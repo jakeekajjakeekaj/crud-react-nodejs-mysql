@@ -39,3 +39,7 @@
 // Una vez ya mas avanzado el proy, ya con conexiones funcionando de la DB al front con utilización hasta el momento de 2 API (POST Y GET), instalaremos bootstrap para mejorar la apariencia: npm install react-bootstrap bootstrap
 
 // Una vez finalizado esto, comenzaremos con el muestreado de nuestra lista de empleados, para esto seleccionaremos algún elemento table de bootstrap para facilitar todo
+
+// Hasta ahorita, ya hemos porgramado los botones de editar, actualizar y cancelar, sin embargo todavía nos falta el botón de eliminar, antes de proceder con este botón, se instalará la librería sweetalert2: npm i sweetalert2 del lado del client
+
+// Ahora nos encargaremos del delete, para este caso solo ocuparemos el id, pero este id vendrá contenido en lo que sería la dirección URL, es por esto que cambia un poco el método de mandar a llamar a esta función

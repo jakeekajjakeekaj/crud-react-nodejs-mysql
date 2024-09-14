@@ -6,7 +6,8 @@ import cors from 'cors';
 import {
   createEmployee,
   getEmployees,
-  updateEmployee
+  updateEmployee,
+  deleteEmployee
 } from './database.js';
 
 const corsOptions = {
@@ -61,8 +62,37 @@ app.put("/api/update/employee", async(req, res)=> {
     if (!id || !name || !age || !country || !charge || !years) {
       return res.status(400).send({ error: "Todos los campos son obligatorios" });
     }
-  
+
+    // Validación adicional si es necesario
+    if (typeof id !== 'number' || typeof name !== 'string' || 
+      typeof age !== 'number' || typeof country !== 'string' || 
+      typeof charge !== 'string' || typeof years !== 'number') {
+      return res.status(400).send({ error: "Formato de datos incorrecto" });
+    }
+
+    // console.log(`${id} ${name} ${age} ${country} ${charge} ${years}`);
+    
     const employee = await updateEmployee(id, name, age, country, charge, years);
+    // console.log("SQL EJECUTADO");
+    res.status(200).send(employee);
+  } catch(err) {
+    console.log(`Error en la actualizacion ${err}`);
+    res.status(500).send({ error: "Internal Server Error" });
+  }
+});
+
+// -- DELETE --
+
+app.delete("/api/delete/employee/:id", async(req, res)=> {
+  try {
+    const { id } = req.params;  // Es decir de los parámetros que se enviarán vía URL
+
+    // Validación básica de los datos
+    if (!id) {
+      return res.status(400).send({ error: "Todos los campos son obligatorios" });
+    }
+  
+    const employee = await deleteEmployee(id);
     // console.log("SQL EJECUTADO");
     res.status(201).send(employee);
   } catch(err) {
