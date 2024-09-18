@@ -26,11 +26,11 @@ export const useEmployees = () => {
     event.preventDefault();
     if (edit) {
       const originalEmployee = employees.find(emp => emp.id === currentEmployee.id);
-      if (validateForm(originalEmployee)) {
+      if (isFormValid(currentEmployee, originalEmployee)) {
         updateEmployee(currentEmployee);
       }
     } else {
-      if (validateForm()) addNewEmployee();
+      if (isFormValid(currentEmployee)) addNewEmployee();
     }
   };
 
@@ -39,18 +39,23 @@ export const useEmployees = () => {
     clearFields();
   };
 
-  const validateForm = (originalEmployee) => {
-    if (
-      currentEmployee.name === originalEmployee?.name &&
-      currentEmployee.age === originalEmployee?.age &&
-      currentEmployee.country === originalEmployee?.country &&
-      currentEmployee.charge === originalEmployee?.charge &&
-      currentEmployee.years === originalEmployee?.years
-    ) {
-      return true; // Sin cambios
+  // Función centralizada para validar el formulario
+  const isFormValid = (employeeData, originalEmployee = null) => {
+    // Validar que los datos no sean iguales al empleado original en caso de edición
+    if (originalEmployee) {
+      if (
+        employeeData.name === originalEmployee.name &&
+        employeeData.age === originalEmployee.age &&
+        employeeData.country === originalEmployee.country &&
+        employeeData.charge === originalEmployee.charge &&
+        employeeData.years === originalEmployee.years
+      ) {
+        return true; // No se hicieron cambios
+      }
     }
 
-    if (!currentEmployee.name || !currentEmployee.age || !currentEmployee.country || !currentEmployee.charge || !currentEmployee.years) {
+    // Validar campos vacíos
+    if (!employeeData.name || !employeeData.age || !employeeData.country || !employeeData.charge || !employeeData.years) {
       MySwal.fire({
         title: "Error",
         text: "Por favor, completa todos los campos.",
@@ -60,7 +65,8 @@ export const useEmployees = () => {
       return false;
     }
 
-    if (currentEmployee.age <= 0 || currentEmployee.years < 0) {
+    // Validar que la edad y años de experiencia sean mayores a 0
+    if (employeeData.age <= 0 || employeeData.years < 0) {
       MySwal.fire({
         title: "Error",
         text: "La edad y los años de experiencia deben ser mayores que 0.",
@@ -69,7 +75,8 @@ export const useEmployees = () => {
       });
       return false;
     }
-    return true;
+
+    return true; // Formulario válido
   };
 
   const addNewEmployee = async () => {
