@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import {
@@ -22,7 +22,8 @@ export const useEmployees = () => {
 
   const MySwal = withReactContent(Swal);
 
-  const handleSubmit = (event) => {
+  // useCallBack sería para las funciones que se pasan como props, de esta manera evitamos que se reendericen a cada rato y solo baste con que lo hagan una vez, a excepción de que cambien sus props, para este caso el edit, employees o el currentEmployee
+  const handleSubmit = useCallback((event) => {
     event.preventDefault();
     if (edit) {
       const originalEmployee = employees.find(emp => emp.id === currentEmployee.id);
@@ -32,15 +33,15 @@ export const useEmployees = () => {
     } else {
       if (isFormValid(currentEmployee)) addNewEmployee();
     }
-  };
+  }, [edit, employees, currentEmployee]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(()=> {
     setEdit(false);
     clearFields();
-  };
+  }, []);
 
   // Función centralizada para validar el formulario
-  const isFormValid = (employeeData, originalEmployee = null) => {
+  const isFormValid = useCallback((employeeData, originalEmployee = null) => {
     // Validar que los datos no sean iguales al empleado original en caso de edición
     if (originalEmployee) {
       if (
@@ -77,9 +78,9 @@ export const useEmployees = () => {
     }
 
     return true; // Formulario válido
-  };
+  }, [MySwal]);
 
-  const addNewEmployee = async () => {
+  const addNewEmployee = useCallback(async () => {
     try {
       await addEmployee(currentEmployee);
       fetchAllEmployees();
@@ -93,9 +94,9 @@ export const useEmployees = () => {
     } catch (error) {
       showError(error, "Error al agregar el usuario");
     }
-  };
+  }, [currentEmployee]);
 
-  const updateEmployee = async () => {
+  const updateEmployee = useCallback(async () => {
     try {
       await modifyEmployee(currentEmployee);
       fetchAllEmployees();
@@ -110,9 +111,9 @@ export const useEmployees = () => {
     } catch (error) {
       showError(error, "Error al actualizar el usuario");
     }
-  };
+  }, [currentEmployee]);
 
-  const deleteEmployee = async (id, name) => {
+  const deleteEmployee = useCallback(async (id, name) => {
     const result = await MySwal.fire({
       title: "¿Estás seguro?",
       text: `Eliminarás al usuario ${name} de forma permanente`,
@@ -138,18 +139,18 @@ export const useEmployees = () => {
         showError(error, "Error al eliminar el usuario");
       }
     }
-  };
+  }, [MySwal]);
 
-  const fetchAllEmployees = async () => {
+  const fetchAllEmployees = useCallback(async () => {
     try {
       const res = await fetchEmployees();
       setEmployees(res.data);
     } catch (error) {
       showError(error, "Error al obtener los usuarios");
     }
-  };
+  }, []);
 
-  const showError = (error, message) => {
+  const showError = useCallback((error, message) => {
     let errorMessage = message;
     let detailedError = null;
 
@@ -171,9 +172,9 @@ export const useEmployees = () => {
       footer: detailedError,
       timer: 3500
     });
-  };
+  }, [MySwal]);
 
-  const clearFields = () => {
+  const clearFields = useCallback(() => {
     setCurrentEmployee({
       name: "",
       age: "",
@@ -182,12 +183,12 @@ export const useEmployees = () => {
       years: "",
       id: ""
     });
-  };
+  }, []);
 
-  const editEmployee = (employee) => {
+  const editEmployee = useCallback((employee) => {
     setEdit(true);
     setCurrentEmployee(employee);
-  };
+  }, []);
 
   // Cargar empleados al montar el hook
   useEffect(() => {
