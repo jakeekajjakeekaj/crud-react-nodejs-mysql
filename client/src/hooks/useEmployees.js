@@ -150,11 +150,25 @@ export const useEmployees = () => {
   };
 
   const showError = (error, message) => {
+    let errorMessage = message;
+    let detailedError = null;
+
+    if (error.response) {
+      // Errores del servidor
+      detailedError = error.response.data.message || error.response.data || 'Error del servidor';
+    } else if (error.request) {
+      // Errores de red o falta de respuesta del servidor
+      detailedError = "No se pudo contactar al servidor. Por favor, intente más tarde.";
+    } else {
+      // Otros errores (ej. errores de código o de configuración)
+      detailedError = error.message;
+    }
+
     MySwal.fire({
       title: "Oooops...",
-      text: message,
+      text: errorMessage,
       icon: "error",
-      footer: JSON.parse(JSON.stringify(error)).message === "Network Error" ? "Intente más tarde" : JSON.parse(JSON.stringify(error)),
+      footer: detailedError,
       timer: 3500
     });
   };
