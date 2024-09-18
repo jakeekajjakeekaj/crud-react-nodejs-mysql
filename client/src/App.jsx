@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import Axios from 'axios';
+// import Axios from 'axios';
+import {
+  getEmployees as fetchEmployees,
+  createEmployee as addEmployee,
+  updateEmployee as modifyEmployee,
+  deleteEmployee as removeEmployee
+} from './services/employeeServices.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
+import EmployeeList from './components/EmployeeList.jsx';
+import EmployeeForm from './components/EmployeeForm.jsx';
 
 export default function App() {
 
@@ -20,6 +28,23 @@ export default function App() {
   const [edit, setEdit] = useState(false);
 
   const MySwal = withReactContent(Swal);
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    if (edit) {
+      const originalEmployee = employees.find(emp => emp.id === id);
+      if (validateForm(originalEmployee)) {
+        update(originalEmployee);
+      }
+    } else {
+      if (validateForm()) add();
+    }
+  };
+
+  const handleCancel = () => {
+    setEdit(false);
+    limpiarCampos();
+  };
 
   function validateForm (originalEmployee) {
     if (
@@ -62,29 +87,25 @@ export default function App() {
 
   const add = async ()=> {
     try {
-      // alert(name);
-    await Axios.post('http://localhost:3000/api/create/employee', {
+    const newEmployeeData = {
       name,
       age,
       country,
       charge,
       years
-    });
+    };
+    // console.log(newEmployeeData);
+    await addEmployee(newEmployeeData);
+
 
     getEmployees();
-    // alert("Empleado Registrado");
-
-    // Resetea los valores de los inputs
-    // setName("");
-    // setAge("");
-    // setCountry("");
-    // setCharge("");
-    // setYears("");
+  
     limpiarCampos();
     MySwal.fire({
       title: "Registro Exitoso!",
       text: `El usuario ${name} fue registrado`,
       icon: "success",
+      // footer: JSON.parse(JSON.stringify(error)).message==="Network Error"?"Intente más tarde":JSON.parse(JSON.stringify(error)),
       timer: 3500
     });
     // alert("Empleado Registrado");
@@ -93,24 +114,11 @@ export default function App() {
         title: "Ooops...",
         text: "Error al agregar el usuario",
         icon: "error",
-        // footer: JSON.parse(JSON.stringify(error)).message==="Network Error"?"Intente más tarde":JSON.parse(JSON.stringify(error)),
+        footer: JSON.parse(JSON.stringify(error)).message==="Network Error"?"Intente más tarde":JSON.parse(JSON.stringify(error)),
         timer: 3500
       });
       // alert(`Error al registrar usuario: ${error.message}`);
     }
-    // alert(nombre);
-    // Axios.post('http://localhost:3000/create', {
-    //   name,
-    //   age,
-    //   country,
-    //   charge,
-    //   years
-    // }).then(()=> {
-  //     alert("Empleado Registrado");
-  //   })
-  //   .catch((error)=> {
-  //     alert(`Error al registrar usuario: ${error.message}`);
-  //   });
   };
 
   const update = async (originalEmployee)=> {
@@ -125,22 +133,19 @@ export default function App() {
       return;
     };
 
-    console.log("pasa 1");
+    // console.log("pasa 1");
 
     if(validateForm(originalEmployee)) {
       try {
-      console.log("pasa 2");
-      console.log(`${id} ${name} ${age} ${country} ${charge} ${years}`);
-        // alert(name);
-      await Axios.put('http://localhost:3000/api/update/employee', {
-        id,
-        name,
-        age: parseInt(age),
-        country,
-        charge,
-        years: parseInt(years)
-      });
-    console.log("pasa 3");
+    const updatedData = {
+      id,
+      name,
+      age: parseInt(age),
+      country,
+      charge,
+      years: parseInt(years)
+    };
+    await modifyEmployee(updatedData);
   
       await getEmployees();
       // alert("Empleado Actualizado");
@@ -180,8 +185,8 @@ export default function App() {
 
     if (result.isConfirmed) {
       try {
-        // alert(name);
-        await Axios.delete(`http://localhost:3000/api/delete/employee/${id}`);
+        const employeeId = id;
+        await removeEmployee(employeeId);
 
         await getEmployees();
         // alert("Empleado Actualizado");
@@ -213,15 +218,16 @@ export default function App() {
     setCountry("");
     setCharge("");
     setYears("");
+    // console.log("pasa limpiar campos");
   };
 
   const getEmployees = async ()=> {
     try {
-      // console.log("pasa 1");
-      const res = await Axios.get('http://localhost:3000/api/get/employees');
+      const res = await fetchEmployees();
       // console.log("pasa 2");
       setEmployees(res.data);
       // alert("Get");
+      // console.log("pasa getEmployees");
     } catch (error) {
       // alert(`Error al registrar usuario: ${error.message}`);
       MySwal.fire({
@@ -239,7 +245,7 @@ export default function App() {
     getEmployees();
   }, []); // [] asegura que solo se ejecute una vez al montar
 
-  const editEmployee = (val)=> {
+  const editEmp = (val)=> {
     setEdit(true);
 
     setName(val.name);
@@ -252,158 +258,30 @@ export default function App() {
 
   return (
     <div className="App">
-      {/* <div className="list"> */}
-        {/* <button onClick={ getEmployees }>Lista de Empleados</button> */}
-
-        {/* {
-          employees.map((val, key)=> {
-            return (
-              <div key={ key }>
-                {val.name}
-              </div>
-            )
-          })
-        }
-      </div> */}
-
+    
       <div className="card text-center">
         <div className="card-header">
           GESTIÓN DE EMPLEADOS
         </div>
-        <div className="card-body box-clamp">
-
-          <div className="input-group mb-3">
-            <span className="input-group-text equal-span" id="basic-addon1">Nombre: </span>
-            <input type="text"
-              onChange={(event)=> {
-                setName(event.target.value);
-              }}
-              className="form-control"
-              placeholder="Nombre" aria-label="Nombre" aria-describedby="basic-addon1"
-              value={ name }  /* Control del Input */ />
-          </div>
-
-          <div className="input-group mb-3">
-            <span className="input-group-text equal-span" id="basic-addon1">Edad: </span>
-              <input type="number"
-                onChange={(event)=> {
-                  setAge(event.target.value);
-                }}
-                className="form-control" placeholder="Edad" aria-label="Edad" aria-describedby="basic-addon1"
-                value={ age }  /* Control del Input */ />
-          </div>
-
-          <div className="input-group mb-3">
-            <span className="input-group-text equal-span" id="basic-addon1">País: </span>
-            <input type="text"
-              onChange={(event)=> {
-                setCountry(event.target.value);
-              }}
-              className="form-control" placeholder="País" aria-label="Pais" aria-describedby="basic-addon1"
-              value={ country }  /* Control del Input */ />
-          </div>
-
-          <div className="input-group mb-3">
-            <span className="input-group-text equal-span" id="basic-addon1">Cargo: </span>
-              <input type="text"
-                onChange={(event)=> {
-                  setCharge(event.target.value);
-                }}
-                className="form-control" placeholder="Cargo" aria-label="Cargo" aria-describedby="basic-addon1"
-                value={ charge }  /* Control del Input */ />
-          </div>
-
-          <div className="input-group mb-3">
-            <span className="input-group-text equal-span" id="basic-addon1">Años: </span>
-              <input type="number"
-                onChange={(event)=> {
-                  setYears(event.target.value);
-                }}
-                className="form-control" placeholder="Años de Experiencia" aria-label="Años de Experiencia" aria-describedby="basic-addon1"
-                value={ years }  /* Control del Input */ />
-          </div>
-        </div>
-        <div className="card-footer text-body-secondary">
-          {
-            edit == true ?
-            <div>
-              <button /*className='btn btn-success my-button'*/ className='btn btn-warning mx-1' onClick={(event)=> {
-                event.preventDefault();
-                const originalEmployee = employees.find(emp => emp.id === id);  // Busca el empleado original
-                if (validateForm(originalEmployee)){
-                  update(originalEmployee);
-                };
-                // update();
-              }}>Actualizar</button> 
-              <button /*className='btn btn-success my-button'*/ className='btn btn-info mx-1' onClick={(event)=> {
-                event.preventDefault();
-                setEdit(false);
-                limpiarCampos();
-              }}>Cancelar</button>
-            </div>
-            : <button /*className='btn btn-success my-button'*/ className='my-button' onClick={(event)=> {
-              event.preventDefault();
-              if (validateForm()) add();
-              // add();
-            }}>Registrar</button>
-          }
-          {/* <button className='my-button' onClick={(event)=> {
-              event.preventDefault();
-              add();
-            }}>Registrar</button> */}
-        </div>
+        {/* FORMULARIO DE EMPLEADOS */}
+        <EmployeeForm 
+          name={name} setName={setName}
+          age={age} setAge={setAge}
+          country={country} setCountry={setCountry}
+          charge={charge} setCharge={setCharge}
+          years={years} setYears={setYears}
+          edit={edit}
+          handleSubmit={handleSubmit}
+          handleCancel={handleCancel}
+        />
       </div>
 
-      <table className="table table-striped box-clamp">
-        <thead>
-          <tr>
-            <th scope="col">No</th>
-            {/* <th scope="col">#</th> */}
-            <th scope="col">Nombre</th>
-            <th scope="col">Edad</th>
-            <th scope="col">País</th>
-            <th scope="col">Cargo</th>
-            <th scope="col">Experiencia</th>
-            <th scope="col">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            employees.map((val, index)=> {
-              return (
-                <tr key={ val.id }>
-                  <th scope="row">{ index + 1 }</th>
-                  {/* <td scope="row">{ val.id }</td> */}
-                  <td>{ val.name }</td>
-                  <td>{ val.age }</td>
-                  <td>{ val.country }</td>
-                  <td>{ val.charge }</td>
-                  <td>{ val.years }</td>
-                  <td>
-                  <div className="btn-group" role="group" aria-label="Basic example">
-                    <button type="button"
-                    onClick={ ()=> {
-                      editEmployee(val);
-                    } }
-                    className="btn btn-info">Editar</button>
-
-                    <button type="button"
-                    onClick={ ()=> {
-                      deleteEmp(val.id, val.name)
-                    } }
-                    className="btn btn-danger">Eliminar</button>
-                  </div>
-                  </td>
-                </tr>
-                // <div key={ key }>
-                //   {val.name}
-                // </div>
-              )
-            })
-          }
-        </tbody>
-      </table>
-
+      {/* table */}
+      <EmployeeList 
+      employees = { employees }
+      editEmp = { editEmp }
+      deleteEmp = { deleteEmp }
+      />
     </div>
   )
 };
