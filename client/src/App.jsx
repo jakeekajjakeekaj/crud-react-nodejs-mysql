@@ -37,9 +37,9 @@ export default function App() {
            
           years = { currentEmployee.years } setYears = { (value)=> setCurrentEmployee({ ...currentEmployee, years: value }) }
 
-          edit={edit}
-          handleSubmit={handleSubmit}
-          handleCancel={handleCancel}
+          edit={ edit }
+          handleSubmit={ handleSubmit }
+          handleCancel={ handleCancel }
         />
       </div>
 
